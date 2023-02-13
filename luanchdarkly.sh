@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# cd /home/aneesh/repos/confluentic/cc-kafka-platform-manager
-# git pull
 
-echo "Enter config name ex: kafka.config.enable.produce.consume.metric.logging"
+
+echo "Enter complete path for cluster list ex: users/user/canaries-devel.json"
+read cluster_list_path
+echo "Enter config name ex: test.config.enable"
 read config_name
 echo "Enter environment ex: prod/devel/stag"
 read environment
@@ -13,14 +14,14 @@ echo "Enter config value"
 read flag_value
 
 
-clusters="$(cat /Users/amasingh/cc-kafka-platform-manager/src/main/resources/rollouts/kafka/canaries-devel.json)"
+clusters="$(cat $cluster_list_path)"
 
 
 internal_canaries="$(echo $clusters | jq '.clusters.internal_canaries' | awk '{printf("%s",$0)} END { printf "\n" }')"
 external_canaries="$(echo $clusters | jq '.clusters.external_canaries' | awk '{printf("%s",$0)} END { printf "\n" }')"
 phase_n_canaries="$(echo $clusters | jq '.clusters.phase_n_canaries' | awk '{printf("%s",$0)} END { printf "\n" }')"
 
-echo "Fecthing config details"
+echo "Fecthing config details ${external_canaries}"
 flag_details="$(curl -X GET 'https://app.launchdarkly.com/api/v2/flags/default/'${config_name} -H 'Authorization: '${authorization_key} | jq)"
 
 echo "Sucessfully got the config details"
